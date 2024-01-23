@@ -1,0 +1,8 @@
+{
+    "colors": {
+        "background": "bg-slate-900",
+        "background1": "bg-stone-400",
+        "background3": "bg-gray-500",
+        "text": "text-white"
+    }
+}

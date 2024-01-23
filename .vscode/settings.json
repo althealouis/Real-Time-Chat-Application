@@ -1,0 +1,4 @@
+{
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

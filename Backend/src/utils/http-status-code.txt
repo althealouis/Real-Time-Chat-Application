@@ -1,0 +1,30 @@
+
+HTTP status codes are standard response codes given by web servers on the internet. They provide information about the status of a request made by a client to the server. Here's a brief overview of some commonly encountered HTTP status codes:
+
+1xx Informational: These are provisional responses and indicate that the request has been received and the process is continuing.
+
+100 Continue: The server has received the initial part of the request and is continuing with the process.
+101 Switching Protocols: The server agrees to switch protocols to the one specified in the upgrade header of the request.
+
+2xx Success: These indicate that the client's request was received, understood, and accepted.
+
+200 OK: The request has succeeded.
+201 Created: The request has been fulfilled and a new resource has been created.
+204 No Content: The server has successfully fulfilled the request, but there is no additional content to send.
+
+3xx Redirection: These indicate that further action needs to be taken by the client to fulfill the request.
+
+301 Moved Permanently: The requested URL has been permanently moved to a new location.
+302 Found: The requested URL has been temporarily moved to a different location.
+304 Not Modified: The client's cached version is still valid, and there's no need to transfer the requested resource again.
+4xx Client Errors: These indicate that there was a problem with the client's request.
+
+400 Bad Request: The server did not understand the request due to invalid syntax.
+401 Unauthorized: The request requires user authentication.
+403 Forbidden: The server understood the request but refuses to authorize it.
+404 Not Found: The requested resource could not be found on the server.
+5xx Server Errors: These indicate that the server failed to fulfill a valid request.
+
+500 Internal Server Error: A generic error message indicating that the server encountered an unexpected condition.
+502 Bad Gateway: The server received an invalid response from the upstream server while acting as a gateway or proxy.
+503 Service Unavailable: The server is currently unable to handle the request due to temporary overloading or maintenance.
