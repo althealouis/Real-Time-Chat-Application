@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom';
 import { eyeImage } from '../assets/images/imagesIndex';
+import axiosInstance from '../axiosInstance';
 
 function Register() {
   const [username, setUsername] = useState('');
@@ -12,7 +13,7 @@ function Register() {
   const handleRegister = async (e) => {
     try {
       e.preventDefault();
-      const response = await axios.post('http://localhost:5000/api/v1/register', {username, password});
+      const response = await axiosInstance.post('/api/v1/register', {username, password});
       // console.log('User registered from client side', response.data);
       navigate('/')
       setUsername('');

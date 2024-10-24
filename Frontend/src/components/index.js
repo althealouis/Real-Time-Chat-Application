@@ -1,11 +1,17 @@
 import Avatar from "./Avatar";
 import Logo from "./Logo";
-import Input from "./Input";
+import MessageInput from "./MessageInput";
 import Contacts from "./Contacts";
+import SendButton from "./SendButton"
+import SendFile from "./SendFile"
+import LogoutButton from "./LogoutButton"
 
 export {
     Avatar,
     Logo,
-    Input,
-    Contacts
+    MessageInput,
+    Contacts,
+    SendButton,
+    SendFile,
+    LogoutButton
 }

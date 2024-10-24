@@ -3,6 +3,7 @@ import React from 'react'
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { eyeImage } from "../assets/images/imagesIndex";
+import axiosInstance from "../axiosInstance";
 
 
 function Login() {
@@ -16,8 +17,8 @@ function Login() {
       e.preventDefault();
       
       // Send a POST request to the server with the username and password
-      const response = await axios.post(
-        'http://localhost:5000/api/v1/login',
+      const response = await axiosInstance.post(
+        '/api/v1/login',
         { username: username, password: password},
         { withCredentials: true }
       )

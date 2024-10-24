@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Avatar, Logo, Input, Contacts, SendButton, SendFile } from "../components";
+import { Avatar, Logo, MessageInput, Contacts, SendButton, SendFile, LogoutButton } from "../components";
 import { UserContext } from "../components/UserContext";
 import { uniqBy } from "lodash"
 import axios from "axios";
+import axiosInstance from "../axiosInstance";
 
 function Chat() {
   const [ws, setWs] = useState(null);
@@ -60,7 +61,7 @@ function Chat() {
   }
 
   function logout() {
-    axios.post('http://localhost:5000/api/v1/logout')
+    axiosInstance.post('/api/v1/logout')
     .then(() => {
         // Clear WebSocket and user state
         setWs(null);
@@ -100,7 +101,7 @@ function Chat() {
         receiver: selectedUserId
       }])
       if(file) {
-        axios.get('http://localhost:5000/api/v2/messages/' + selectedUserId, config).then(res => {
+        axiosInstance.get('/api/v2/messages/' + selectedUserId, config).then(res => {
           setMessages(res.data)
         })
       }
@@ -125,7 +126,7 @@ function Chat() {
 
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/v1/users')
+    axiosInstance.get('/api/v1/users')
     .then(response => {
       // console.log(response.data)
       const allUsers = response.data;
@@ -140,7 +141,7 @@ function Chat() {
 
   useEffect(() => {
     if (selectedUserId) {
-      axios.get('http://localhost:5000/api/v2/messages/' + selectedUserId, config)
+      axiosInstance.get('/api/v2/messages/' + selectedUserId, config)
       .then(response => {
         setMessages(response.data)
         console.log("this data is from the messages endpoint -> ",response.data)
@@ -174,13 +175,6 @@ function Chat() {
             <div className=" mt-6">
               {/* looping through all the online users */}
               {Object.keys(onlineUsersExcludingLoggedInUser).map((userId) => (
-                // <Contacts 
-                //   key={userId}
-                //   id={userId}
-                //   onClick={() => {setSelectedUserId[userId];console.log(userId)}}
-                //   username={onlineUsersExcludingLoggedInUser[userId]}
-                //   online={true}
-                //   selected={userId === selectedUserId} />
                 <div key={userId} onClick={() => setSelectedUserId(userId)} className={"border-b border-t flex flex-grow border-gray-500 cursor-pointer " + 
                 (userId === selectedUserId ? " bg-gray-700 shadow-xl" : "") }>
                   {/* this is for the bar */}
@@ -202,16 +196,8 @@ function Chat() {
               ))}
               {/* looping through all the offline users */}
               {Object.keys(offlineUser).map((userId) => (
-                // <Contacts 
-                //   key={userId}
-                //   id={userId}
-                //   onClick={() => setSelectedUserId[userId]}
-                //   username={offlineUser[userId]?.username}
-                //   online={false}
-                //   selected={userId === selectedUserId} />
                 <div key={userId} onClick={() => setSelectedUserId(userId)} className={"border-b border-t flex flex-grow border-gray-500 cursor-pointer " + 
                 (userId === selectedUserId ? " bg-gray-700 shadow-xl" : "") }>
-
                   {userId === selectedUserId && (
                     <div className=" w-1.5 h-15 bg-slate-200 rounded-r-xl opacity-30 "></div>
                   )}
@@ -242,11 +228,7 @@ function Chat() {
               <span className="ml-2">{username}</span> {/* Adjust spacing with ml-2 */}
             </span>
 
-            <button
-              onClick={logout}
-              className="text-sm bg-blue-100 py-1 px-2 text-slate-900 border rounded-lg">
-              LOGOUT
-            </button>
+            <LogoutButton onLogout={logout} />
           </div>
         </div>
 
@@ -289,20 +271,10 @@ function Chat() {
           
           {selectedUserId && (
             <form className=" flex p-2 mb-2" onSubmit={sendMessage}>
-              <input
-                value={newMessageText}
-                type="text"
-                placeholder="Type your message here"
-                onChange={(e) => setNewMessageText(e.target.value)}
-                className="flex-grow mr-2 rounded-xl shadow-md border-white text-slate-900 p-3 font-medium hover:border-gray-600"
-              />
+              {/* Message Input section */}
+              <MessageInput newMessageText={newMessageText} setNewMessageText={setNewMessageText} />
               {/* attachment section */}
-              <label className=" shadow-md text-white  cursor-pointer font-semibold p-3 px-4 rounded-xl">
-                <input type="file" className="hidden" onChange={sendFile}/>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                    <path fill-rule="evenodd" d="M18.97 3.659a2.25 2.25 0 0 0-3.182 0l-10.94 10.94a3.75 3.75 0 1 0 5.304 5.303l7.693-7.693a.75.75 0 0 1 1.06 1.06l-7.693 7.693a5.25 5.25 0 1 1-7.424-7.424l10.939-10.94a3.75 3.75 0 1 1 5.303 5.304L9.097 18.835l-.008.008-.007.007-.002.002-.003.002A2.25 2.25 0 0 1 5.91 15.66l7.81-7.81a.75.75 0 0 1 1.061 1.06l-7.81 7.81a.75.75 0 0 0 1.054 1.068L18.97 6.84a2.25 2.25 0 0 0 0-3.182Z" clip-rule="evenodd" />
-                </svg>
-              </label>
+              <sendFile onSendFile={sendFile} />
               {/* send button */}
               <SendButton/>
             </form>
