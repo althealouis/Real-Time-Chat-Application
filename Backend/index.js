@@ -7,6 +7,9 @@ const { createServer } = require("node:http");
 const { WebSocketServer } = require("ws");
 const { log } = require("node:console");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require("path");
+const { v4: uuidv4 } = require('uuid');
 
 const port = process.env.PORT;
 const mongodb_uri = process.env.MONGODB_URI;
@@ -28,14 +31,15 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use("/uploads/", express.static(path.join(__dirname, 'public')));
 
 app.get("/", (req, res) => {
     res.send("<h1>Welcome to the API</h1>");
 });
 
 //* ROUTES ----
-const userEndpoint = require("./src/routes/user.routes");
-const messageEndpoint = require('./src/routes/message.routes');
+const userEndpoint = require("./src/routes/user.routes.js");
+const messageEndpoint = require('./src/routes/message.routes.js');
 
 //* ENDPOINTS ----
 app.use("/api/v1/", userEndpoint);
@@ -103,41 +107,54 @@ wss.on("connection", (socket, request) => {
     //for messages -> 
     socket.on("message", async (message) => {
         const { messageData } = JSON.parse(message.toString());
-        // log(messageData);
-        const { text, receiver } = messageData;
-        // log(text)
-        // log(receiver)
-        if (text && receiver) {
-            log(receiver)
-            // log(author)
+        const { text, receiver, author, file } = messageData;
+        let filename = null;
+        if (file) {
+            // Get file extension
+            const parts = file.name.split('.');
+            const extension = parts[parts.length - 1];
+            // Generate a unique filename
+            filename = uuidv4() + '.' + extension;
+            // Secure file path using `path.join`
+            const uploadPath = path.join(__dirname, 'public', filename);
+            // Convert base64 to Buffer
+            const bufferData = Buffer.from(file.data.split(',')[1], 'base64');
+            // Save the file locally
+            fs.writeFile(uploadPath, bufferData, (err) => {
+                if (err) {
+                    console.error('Error saving file:', err);
+                } else {
+                    console.log('File Saved:', uploadPath);
+                }
+                });
+        }
+        //* save message to the database
+        if ((text || file) && receiver && author) {
+
             const messageDoc = await Message.create({
                 sender: socket.userId,
                 receiver: receiver,
-                text
+                text,
+                file : file ? filename : null
             })
+
             let receiverSocket = [...wss.clients].find(
                 (client) =>
                 client.userId && client.userId === receiver
             );
+
             if (!receiverSocket) return;
             receiverSocket.send(
                 JSON.stringify({
-                    text: text,
                     sender: socket.userId,
                     receiver: receiver,
+                    text: text,
+                    file: file ? filename : null,
                     timestamp: new Date().toISOString(),
                     id: messageDoc._id
                 })
             );
         }
-
-        // if (text && author && receiver) {
-        //     [...wss.clients]
-        //     .filter(client => client.username === receiver)
-        //     .forEach(client => client.send(JSON.stringify({
-        //         text
-        //     })))
-        // }
     });
 
   //notify everyone about the connected users
