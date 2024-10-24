@@ -9,7 +9,7 @@ router.get('/users', getAllUsers);      //route to get data of all the users
 
 router.post('/login', loginUser);        //route to login the user
 
-router.post('/logout', verifyJWT, logoutUser);       //route to logout user
+router.post('/logout', logoutUser);       //route to logout user
 
 router.get('/current-user', verifyJWT, currentUser);        //route to get current user details
 

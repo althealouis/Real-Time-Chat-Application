@@ -142,25 +142,27 @@ const loginUser = async (req, res) => {
 
 const logoutUser = async (req, res) => {
     try {
-        const userId = req.user._id
-        // console.log("User Id of the current user",userId)
-
         const options = {
             httpOnly: true,
-            secure: true
-        }
-        console.log("user logged out!")
+            secure: true, // Use secure cookies in production (HTTPS)
+            sameSite: 'Strict', // Prevent CSRF attacks
+            expires: new Date(0) // Expire the cookie immediately
+        };
 
+        console.log("User logged out!");
+
+        // Clear the token cookie
         return res
-        .status(200)
-        .clearCookie("Access-Token", options)
-        .json({
-            message: "User logged out successfully!"
-        })
+            .cookie('Access-Token', '', options)
+            .status(200) // Send a 200 OK response
+            .json({ message: 'User logged out!' });
+
     } catch (error) {
-        console.log("logoutUser ERROR :: ", error)
+        console.log("logoutUser ERROR :: ", error);
+        return res.status(500).json({ message: 'Logout failed!' }); // Handle errors
     }
 };
+
 
 const currentUser = async (req, res) => {
     try {

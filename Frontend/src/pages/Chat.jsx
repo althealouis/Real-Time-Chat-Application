@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Avatar, Logo, Input, Contacts } from "../components";
+import { Avatar, Logo, Input, Contacts, SendButton, SendFile } from "../components";
 import { UserContext } from "../components/UserContext";
 import { uniqBy } from "lodash"
 import axios from "axios";
@@ -15,7 +15,7 @@ function Chat() {
   const [newMessageText, setNewMessageText] = useState("");
   const [messages, setMessages] = useState([]);
 
-  const { username, id } = useContext(UserContext);
+  const { username, id, setId, setUsername } = useContext(UserContext);
   // console.log(username);
 
   //? for connection
@@ -58,6 +58,23 @@ function Chat() {
       }]);
     }
   }
+
+  function logout() {
+    axios.post('http://localhost:5000/api/v1/logout')
+    .then(() => {
+        // Clear WebSocket and user state
+        setWs(null);
+        console.log(id)
+        setId(null);
+        setUsername(null);
+
+        // Redirect to the login page
+        window.location.href = '/';
+    })
+    .catch((error) => {
+        console.error('Error logging out:', error);
+    });
+}
   
   const token = localStorage.getItem("token") || null;
   const config = {
@@ -217,15 +234,20 @@ function Chat() {
             </div>
           </div>
           {/* User information */}
-          <div className="text-center flex items-center p-2 cursor-pointer">
-            <span className="text-slate-900 flex font-bold items-center"> 
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clip-rule="evenodd" />
+          <div className="p-2 flex items-center font-bold justify-between"> {/* Changed justify-center to justify-between */}
+            <span className="text-slate-900 text-sm flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                <path fillRule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" clipRule="evenodd" />
               </svg>
               <span className="ml-2">{username}</span> {/* Adjust spacing with ml-2 */}
             </span>
-          </div>
 
+            <button
+              onClick={logout}
+              className="text-sm bg-blue-100 py-1 px-2 text-slate-900 border rounded-lg">
+              LOGOUT
+            </button>
+          </div>
         </div>
 
         {/* right panel */}
@@ -282,13 +304,7 @@ function Chat() {
                 </svg>
               </label>
               {/* send button */}
-              <button
-                  type="Submit"
-                  className="bg-sky-500 shadow-md hover:bg-sky-600 text-white font-semibold p-3 px-4 rounded-xl">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                </svg>
-              </button>
+              <SendButton/>
             </form>
           )}
         </div>
